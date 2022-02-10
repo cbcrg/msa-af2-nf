@@ -1,0 +1,112 @@
+Bootstrap: docker
+From: ubuntu:bionic
+
+%files
+	cns_solve_1.3_all_intel-mac_linux.tar.gz	# Download your CNS installation tarball in your working directory
+
+%post
+	apt-get -y update
+	apt-get -y install gcc g++ gfortran-4.8 make python3 \
+	python \
+	wget \
+	curl \
+	unzip \
+	csh \
+	git \
+	autoconf automake \
+	tar \
+	libssl-dev \
+	flex \
+	zlib1g-dev
+	# Install cmake
+	wget https://github.com/Kitware/CMake/releases/download/v3.17.3/cmake-3.17.3.tar.gz && \
+        tar -zxvf cmake-3.17.3.tar.gz && rm cmake-3.17.3.tar.gz && \
+        cd cmake-3.17.3 && \
+        ./bootstrap && make && make install
+	# Install python3 and dependencies
+	apt-get -y install python3-pip
+	pip3 install --upgrade pip
+	pip3 install torch torchvision numpy scipy
+	update-alternatives --install /usr/bin/python python /usr/bin/python3 10
+	# Install CCMpred and freecontact
+	cd / && git clone --recursive https://github.com/soedinglab/CCMpred.git && \
+        cd CCMpred && git checkout 688e4ba1734bde553e7299ce058b08fae49bb248 && \
+        cmake -D WITH_CUDA=OFF . && make
+	apt-get -y install freecontact
+	# Install Modeller
+	cd / && wget https://salilab.org/modeller/9.24/modeller_9.24-1_amd64.deb && \
+        env KEY_MODELLER=<TO BE FILLED> dpkg -i modeller_9.24-1_amd64.deb	# Fill in your MODELLER KEY in the specific field
+	rm modeller_9.24-1_amd64.deb
+	# Install CNS
+	cp /usr/bin/gfortran-4.8 /usr/bin/gfortran
+	tar -zxvf /cns_solve_1.3_all_intel-mac_linux.tar.gz && \
+	mv /cns_solve_1.3/.cns_solve_env_sh /cns_solve_1.3/cns_solve_env.sh && \
+        sed -i "s|setenv CNS_SOLVE '_CNSsolve_location_'|setenv CNS_SOLVE '/cns_solve_1.3'|g" /cns_solve_1.3/cns_solve_env && \
+        sed -i "s|CNS_SOLVE=_CNSsolve_location_|CNS_SOLVE=/cns_solve_1.3|g" /cns_solve_1.3/cns_solve_env.sh && \
+        sed -i "s|PARAMETER (MXFPEPS2=1024)|PARAMETER (MXFPEPS2=8192)|g" /cns_solve_1.3/source/machvar.inc && \
+        sed -i 's|echo "   static-fastm|#echo "   static-fastm|g' /cns_solve_1.3/Makefile && \
+        sed -i "s|PARAMETER (MXRTP=2000)|PARAMETER (MXRTP=4000)|g" /cns_solve_1.3/source/rtf.inc && \
+        head -66 /cns_solve_1.3/source/machvar.f > newmachvar.f && \
+        echo '        WRITE (6,'\''(I6,E10.3,E10.3)'\'') I, ONEP, ONEM' >> newmachvar.f  && \
+        tail -n +67 /cns_solve_1.3/source/machvar.f >> newmachvar.f  && \
+        mv newmachvar.f /cns_solve_1.3/source/machvar.f && \
+        sed -i "s/nrestraints \= 20000/nrestraints \= 50000/g" /cns_solve_1.3/modules/nmr/readdata && \
+        sed -i "s/nassign 1600/nassign 3000/g" /cns_solve_1.3/modules/nmr/readdata && \
+        cd /cns_solve_1.3/ && make install
+	. /cns_solve_1.3/cns_solve_env.sh
+	rm /cns_solve_1.3_all_intel-mac_linux.tar.gz
+	# Install hhsuite
+	mkdir /hhsuite && cd /hhsuite && \
+        wget https://github.com/soedinglab/hh-suite/releases/download/v3.2.0/hhsuite-3.2.0-SSE2-Linux.tar.gz && \
+        tar -zxvf hhsuite-3.2.0-SSE2-Linux.tar.gz && rm hhsuite-3.2.0-SSE2-Linux.tar.gz && \
+        cp ./bin/* /usr/bin/
+	# Install blast legacy
+	cd / && wget ftp://ftp.ncbi.nlm.nih.gov/blast/executables/legacy.NOTSUPPORTED/2.2.26/blast-2.2.26-x64-linux.tar.gz && \
+        tar -zxvf blast-2.2.26-x64-linux.tar.gz && rm blast-2.2.26-x64-linux.tar.gz
+	# Install cdhit
+	cd / && git clone https://github.com/weizhongli/cdhit.git && \
+        cd cdhit && git checkout fe5df0f64adeb707139b2e7b8db63a4909943e5b && \
+        make
+	# Install DMPfold
+	cd / && git clone https://github.com/psipred/DMPfold.git && \
+        cd DMPfold && git checkout bffa8bc449a65e6d65a9a16dfb7976c3895778e8 && \
+        cd cnsfiles && cp /cns_solve_1.3/inputs/general/generate_seq.inp . && cp /cns_solve_1.3/inputs/nmr_calc/generate_extended.inp . && cp /cns_solve_1.3/inputs/nmr_calc/dg_sa.inp && \
+	patch dgsa.inp dgsa.diff && patch extn.inp extn.diff && patch gseq.inp gseq.diff && \
+	sed -i "s/ncpu \= 1/ncpu \= 8/g" /DMPfold/seq2maps.csh && \
+        sed -i "s/\~\/DMPfold/\/DMPfold/g" /DMPfold/seq2maps.csh && \
+        sed -i "s/\~\/hh-suite/\/hhsuite/g" /DMPfold/seq2maps.csh && \
+	#######
+	# Specify the path to your uniclust30_2018_08 database in the second part of sed command using backslashes before the slash key (e.g. \/users\/cn\/abaltzis\/db\/uniclust30_2018_08 --> /users/cn/abaltzis/db/uniclust30_2018_08
+        sed -i "s/\~\/uniclust30_2018_08/\/users\/cn\/abaltzis\/db\/uniclust30_2018_08/g" /DMPfold/seq2maps.csh && \	
+	#
+	######
+        sed -i "s/\~\/CCMpred\/bin/\/CCMpred\/bin/g" /DMPfold/seq2maps.csh && \
+        sed -i "s/\~\/freecontact\/bin\/freecontact/\/usr\/bin\/freecontact/g" /DMPfold/seq2maps.csh && \
+        sed -i "s/\~\/blast\/bin/\/blast-2\.2\.26\/bin/g" /DMPfold/seq2maps.csh && \
+        sed -i "s/ncpu \= 1/ncpu = 8/g" /DMPfold/aln2maps.csh && \
+        sed -i "s/\~\/DMPfold/\/DMPfold/g" /DMPfold/aln2maps.csh && \
+        sed -i "s/\~\/CCMpred\/bin/\/CCMpred\/bin/g" /DMPfold/aln2maps.csh && \
+        sed -i "s/\~\/freecontact\/bin\/freecontact/\/usr\/bin\/freecontact/g" /DMPfold/aln2maps.csh && \
+        sed -i "s/\~\/blast\/bin/\/blast-2\.2\.26\/bin/g" /DMPfold/aln2maps.csh && \
+        sed -i "s/\~\/dmpfold/\/DMPfold/g" /DMPfold/bin/runpsipredandsolvwithdb && \
+        sed -i "s/\~\/blast\/bin/\/blast-2\.2\.26\/bin/g" /DMPfold/bin/runpsipredandsolvwithdb && \
+        sed -i "s/\~\/DMPfold/\/DMPfold/g" /DMPfold/run_dmpfold.sh && \
+        sed -i 's/source \~\/cns_solve_1\.3\/\.cns_solve_env_sh/\. \/cns_solve_1\.3\/cns_solve_env\.sh/g' /DMPfold/run_dmpfold.sh && \
+        sed -i "s/\~\/DMPfold/\/DMPfold/g" /DMPfold/predict_tmscore.sh && \
+        sed -i "s/\~\/cdhit\/cd-hit/\/cdhit\/cd-hit/g" /DMPfold/predict_tmscore.sh
+	git clone https://github.com/psipred/psicov.git && cd psicov && \
+        git checkout ac01f3ef98b2eaf87b9f4bb9898baf1ea8a2feeb && \
+        cd src && make && \
+        cp ./psicov /DMPfold/bin
+	export CNS_SOLVE="/cns_solve_1.3"
+        export PATH="/cns_solve_1.3/intel-x86_64bit-linux/bin:$PATH"
+	export TMPDIR=/tmp
+
+%environment
+	export CNS_SOLVE="/cns_solve_1.3"
+	export PATH="/cns_solve_1.3/intel-x86_64bit-linux/bin:$PATH"
+	export TMPDIR=/tmp
+
+%labels
+	Author Athanasios Baltzis
+	MyLabel DMPfold v0.1

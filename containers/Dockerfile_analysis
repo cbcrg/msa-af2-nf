@@ -1,0 +1,121 @@
+FROM debian:jessie
+
+MAINTAINER Athanasios Baltzis <baltzis.athanasios@gmail.com>
+
+RUN	apt-get -y update && \
+	apt-get -y install gcc g++ gfortran \
+	python python-pip \
+	wget curl \
+	git \
+	make \
+	autoconf automake \
+	tar \
+	bzip2 \
+	libssl-dev \
+	flex \
+	zlib1g-dev \
+	libbz2-dev \
+	libiomp-dev \
+	dssp
+
+	#
+	# Install mTM-align
+	#
+RUN	cd / && wget https://yanglab.nankai.edu.cn/mTM-align/version/mTM-align.tar.bz2 && \
+	tar -xvf mTM-align.tar.bz2 && \
+	cp mTM-align/mTM-align /bin && \
+	rm -rf mTM-align*
+
+	#
+	# Install tcoffee
+	#
+RUN	cd / && git clone https://github.com/cbcrg/tcoffee.git && cd tcoffee && \
+	git checkout c355d11ba711006d81b6bb0b4b0efe224d096f8c && \
+	cd t_coffee/src && make t_coffee && \
+	mv * /bin
+ENV HOME_4_TCOFFEE '/tmp/.tcoffee/'
+ENV CACHE_4_TCOFFEE '/tmp/.tcoffee/cache'
+ENV LOCKDIR_4_TCOFFEE '/tmp/.tcoffee/lock'
+ENV TMP_4_TCOFFEE '/tmp/.tcoffee/tmp'
+ENV TRASH_4_TCOFFEE '/tmp/.tcoffee/trash'
+ENV EMAIL_4_TCOFFEE="test@gmail.com"
+ENV PERL5LIB="/tcoffee/perl/lib/perl5"
+
+	#
+	# Install Famsa
+	#
+RUN	cd / && wget https://github.com/refresh-bio/FAMSA/archive/v1.6.2.tar.gz && \
+	tar -zxvf v1.6.2.tar.gz && rm v1.6.2.tar.gz && \
+	cd FAMSA-1.6.2 && \
+	sed -i "s|NO_AVX = false|NO_AVX = true|g" makefile && \
+	sed -i "s|NO_AVX2 = false|NO_AVX2 = true|g" makefile && \
+	make && cp ./famsa /bin && \
+	cd ../ && rm -rf FAMSA-1.6.2
+
+	#
+	# Install MSAprobs
+	#
+RUN	cd / && wget --no-check-certificate https://sourceforge.net/projects/msaprobs/files/MSAProbs-0.9.7.tar.gz && \
+	tar -zxvf MSAProbs-0.9.7.tar.gz && \
+	cd MSAProbs-0.9.7/MSAProbs && \
+	make && cp msaprobs /bin && \
+	cd ../../ && rm -rf MSAProbs*
+
+	#
+	# Install SAP
+	#
+RUN	git clone https://github.com/mathbio-nimr-mrc-ac-uk/SAP.git && \
+	cd SAP/ && git checkout 1d956d950d4e6e848878b4732f7e42e2b414c34c && \
+	autoreconf -fvi && ./configure && make && make install && \
+	cd ../ && rm -rf SAP/
+
+	#
+	# Install MAFFT
+	#
+RUN	cd / && wget --no-check-certificate https://mafft.cbrc.jp/alignment/software/mafft-7.453-with-extensions-src.tgz && \
+	tar -zxvf mafft-7.453-with-extensions-src.tgz
+RUN	cd mafft-7.453-with-extensions/core && \
+	make && make install && \
+	cd ../../ && rm -rf mafft-7.453-with-extensions
+
+	#
+	# Install TMalign and TMscore
+	#
+RUN	cd / && wget --no-check-certificate https://zhanglab.ccmb.med.umich.edu/TM-align/TMalign.f && \
+        gfortran -static -O3 -ffast-math -lm -o TMalign TMalign.f  && \
+        mv TMalign /bin/ && rm TMalign.f && \
+        wget --no-check-certificate https://zhanglab.ccmb.med.umich.edu/TM-score/TMscore.f && \
+        gfortran -static -O3 -ffast-math -lm -o TMscore TMscore.f && \
+        mv TMscore /bin/ && rm TMscore.f
+
+	#
+	# Install blast legacy
+	#
+RUN	wget --no-check-certificate https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/2.10.0/ncbi-blast-2.10.0+-x64-linux.tar.gz && \
+	tar -zxvf ncbi-blast-2.10.0+-x64-linux.tar.gz && \
+        mv ncbi-blast-2.10.0+/bin/* /bin/ && \
+        rm -rf ncbi-blast-2.10.0+*
+
+	#
+	# Install clustalo
+	#
+RUN	wget --no-check-certificate http://www.clustal.org/omega/clustalo-1.2.4-Ubuntu-x86_64 && \
+        chmod 755 clustalo-1.2.4-Ubuntu-x86_64 && \
+        mv clustalo-1.2.4-Ubuntu-x86_64 /bin/clustalo
+
+	#
+	# Install samtools
+	#
+RUN	wget --no-check-certificate https://sourceforge.net/projects/samtools/files/samtools/1.11/samtools-1.11.tar.bz2/download && \
+	tar -xvf download && \
+	cd samtools-1.11 && \
+	./configure --without-curses --disable-lzma && make && make install && \
+	cd .. && rm -rf samtools-1.11* download
+
+	#
+	# Install DSSPparser
+	#
+RUN	python -m pip install future
+RUN	apt-get -y install python-dev
+RUN	pip install numpy==1.15.0
+RUN	pip install biopython==1.76
