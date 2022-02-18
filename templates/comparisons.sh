@@ -1,6 +1,6 @@
 for ref_aln in mtmalign 3dcoffee 3dcoffee_TMalign; do
 		for mode in sp tc; do
-			for test_aln in psicoffee tcoffee famsa ginsi msaprobs 3dcoffee 3dcoffee_TMalign mtmalign; do #deepblast
+			for test_aln in psicoffee tcoffee famsa ginsi msaprobs 3dcoffee 3dcoffee_TMalign mtmalign; do
 				t_coffee -other_pg aln_compare -al1 "!{fam}"_selected_ref_"$ref_aln".fa_aln -al2 "!{fam}"_selected_ref_"$test_aln".fa_aln -compare_mode "$mode" | grep -v "seq1" | grep -v "*" | awk -v var=!{fam} '{print var"\t"$4}' ORS="\t" > "!{fam}"_selected_ref_"$test_aln"_vs_ref_"$ref_aln"."$mode"
         		t_coffee -other_pg aln_compare -al1 "!{fam}"_selected_ref_"$ref_aln".fa_aln -al2 "!{fam}"_selected_ref_"$test_aln".fa_aln  -compare_mode "$mode" -io_format s | awk -v var=!{fam} '{print $1"\t"var"\t"$4}' > "!{fam}"_selected_ref_"$test_aln"_vs_ref_"$ref_aln"."$mode".avg
 				t_coffee -other_pg aln_compare -al1 "!{fam}"_selected_ref_"$ref_aln".fa_aln -al2 "!{fam}"_selected_ref_"$test_aln".fa_aln  -compare_mode "$mode" -io_format p | awk -v var=!{fam} '{print $1"\t"$2"\t"var"\t"$4}' > "!{fam}"_selected_ref_"$test_aln"_vs_ref_"$ref_aln"."$mode".pair
@@ -29,7 +29,7 @@ for ref_aln in mtmalign 3dcoffee 3dcoffee_TMalign; do
 		done			
 done
 
-for x in dmpfold alphafold; do
+for x in alphafold; do
 	for ref_aln in mtmalign 3dcoffee 3dcoffee_TMalign; do
 		for mode in sp tc; do
 			t_coffee -other_pg aln_compare -al1 "!{fam}"_selected_ref_"$ref_aln".fa_aln -al2 "!{fam}"_selected_ref_3dcoffee_"$x".fa_aln -compare_mode "$mode" | grep -v "seq1" | grep -v "*" | awk -v var=!{fam} '{print var"\t"$4}' ORS="\t" > "!{fam}"_selected_ref_3dcoffee_"$x"_vs_ref_"$ref_aln"."$mode"

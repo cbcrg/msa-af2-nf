@@ -19,7 +19,7 @@ for i in `cat !{list}`; do echo -e `grep "$i" "!{fam}"_selected_ref.template_lis
 	sort_fasta.py !{fam}_selected_ref_3dcoffee_TMalign.fa_aln > tmp
 	mv tmp !{fam}_selected_ref_3dcoffee_TMalign.fa_aln
 
-	for x in dmpfold alphafold; do
+	for x in alphafold; do
 		for i in `find *."$x".pdb`; do extract_from_pdb -force -infile $i > test.pdb; mv test.pdb $i; done
 		for i in `cat !{list}`; do echo -e ">"$i "_P_" "${i//\//_}"."$x"'.pdb'; done > !{fam}_selected_ref_"$x".template_list
 		for i in `cat !{list}`; do echo -e "${i//\//_}"'.'$x'.pdb'; done > !{fam}_selected_ref_"$x".mtmalign

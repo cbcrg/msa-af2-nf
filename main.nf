@@ -1,10 +1,10 @@
 #!/usr/bin/env nextflow
 
 nextflow.enable.dsl=2
-include {run_seq_aln; run_psicoffee; run_struct_aln; run_comparison; run_evaluation; TCS_filtering; dssp_to_fasta} from "./modules/run_aln_comp_and_eval.nf"
+include {run_seq_aln; run_psicoffee; run_struct_aln; run_comparison; run_evaluation; dssp_to_fasta} from "./modules/run_aln_comp_and_eval.nf"
 include {run_alphafold2; split_multi_fasta} from "./modules/run_af2.nf"
-include {run_seq2maps; run_dmpfold} from "./modules/run_dmpfold.nf"
 
+params.predict = false
 params.db = "$HOME/db/uniref50.fasta"
 params.list = "PF*/*.list"
 params.input_fasta = "PF*/*selected_ref.fa"
@@ -21,6 +21,7 @@ log.info """\
 	Input template lists			: ${params.template}
 	Input PDB structures			: ${params.pdbs}
 	Input path to Database for PSI-Coffee	: ${params.db}
+	Predict structures with AF2		: ${params.predict}
 	"""
 	.stripIndent()
 
@@ -41,29 +42,28 @@ workflow analysis {
 	run_seq_aln.out.seq_aln_output.combine(run_psicoffee.out.psicoffee_output, by: 0).combine(dssp_to_fasta.out.dssp_output, by: 0).combine(run_struct_aln.out.struct_output, by: 0).combine(templates, by: 0).combine(structures, by: 0).combine(af2_models, by: 0).set{comp_and_eval_input}
 	run_comparison(comp_and_eval_input)
 	run_evaluation(comp_and_eval_input)
-	seq_input.combine(templates, by: 0).combine(run_evaluation.out.tcs_avg, by: 0).combine(dssp_to_fasta.out.dssp_output, by: 0).combine(structures, by: 0).combine(af2_models, by: 0).set{tcs_filter_input}
-	TCS_filtering(params.db,tcs_filter_input)
 }
 
 workflow struct_pred_and_analysis {
 	dssp_to_fasta(sec_struct)
 	split_multi_fasta(seq_input)
 	run_alphafold2(split_multi_fasta.out.transpose())
-	run_seq2maps(split_multi_fasta.out.transpose())
-	run_dmpfold(run_seq2maps.out.dmpfold_input)
 	run_seq_aln(seq_input)
 	run_psicoffee(params.db,seq_input)
-	lists.combine(seq_input, by: 0).combine(templates, by: 0).combine(structures, by: 0).combine(run_alphafold2.out.af2_models.mix(run_dmpfold.out.dmpfold_pdbs).groupTuple(), by: 0).set{struct_input}
+	lists.combine(seq_input, by: 0).combine(templates, by: 0).combine(structures, by: 0).combine(run_alphafold2.out.af2_models.groupTuple(), by: 0).set{struct_input}
 	run_struct_aln(struct_input)
-	run_seq_aln.out.seq_aln_output.combine(run_psicoffee.out.psicoffee_output, by: 0).combine(dssp_to_fasta.out.dssp_output, by: 0).combine(run_struct_aln.out.struct_output, by: 0).combine(templates, by: 0).combine(structures, by: 0).combine(run_alphafold2.out.af2_models.mix(run_dmpfold.out.dmpfold_pdbs).groupTuple(), by: 0).set{comp_and_eval_input}
+	run_seq_aln.out.seq_aln_output.combine(run_psicoffee.out.psicoffee_output, by: 0).combine(dssp_to_fasta.out.dssp_output, by: 0).combine(run_struct_aln.out.struct_output, by: 0).combine(templates, by: 0).combine(structures, by: 0).combine(run_alphafold2.out.af2_models.groupTuple(), by: 0).set{comp_and_eval_input}
 	run_comparison(comp_and_eval_input)
 	run_evaluation(comp_and_eval_input)
-	seq_input.combine(templates, by: 0).combine(run_evaluation.out.tcs_avg, by: 0).combine(dssp_to_fasta.out.dssp_output, by: 0).combine(structures, by: 0).combine(run_alphafold2.out.af2_models.mix(run_dmpfold.out.dmpfold_pdbs).groupTuple(), by: 0).set{tcs_filter_input}
-	TCS_filtering(params.db,tcs_filter_input)
 }
 
 workflow {
-	analysis()
+	if (params.predict == false) { 
+		analysis()
+	}
+	else {
+		struct_pred_and_analysis()
+	}
 }
 
 workflow.onComplete {

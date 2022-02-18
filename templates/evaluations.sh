@@ -9,10 +9,6 @@ t_coffee -infile "!{fam}"_selected_ref_ginsi.fa_aln -evaluate -lib "!{fam}"_sele
 grep SCORE "!{fam}"_selected_ref_ginsi.score_ascii | tr "=" "\t" | cut -f2 > "!{fam}"_selected_ref_ginsi.tcs
 grep -P "/.*:" "!{fam}"_selected_ref_ginsi.score_ascii | awk -v var=!{fam} '{print $1"\t"var"\t"$3}' > "!{fam}"_selected_ref_ginsi.tcs.avg
 
-	#t_coffee -infile "!{fam}"_selected_ref_deepblast.fa_aln -evaluate -lib "!{fam}"_selected_ref_deepblast.lib -output score_ascii
-    #    grep SCORE "!{fam}"_selected_ref_deepblast.score_ascii | tr "=" "\t" | cut -f2 > "!{fam}"_selected_ref_deepblast.tcs
-    #    grep -P "/.*:" "!{fam}"_selected_ref_deepblast.score_ascii | awk -v var=!{fam} '{print $3}' > "!{fam}"_selected_ref_deepblast.tcs.avg
-
 t_coffee -infile "!{fam}"_selected_ref_3dcoffee.fa_aln -evaluate -lib "!{fam}"_selected_ref.sap.lib "!{fam}"_selected_ref.TMalign.lib -output score_ascii
 grep SCORE "!{fam}"_selected_ref_3dcoffee.score_ascii | tr "=" "\t" | cut -f2 > "!{fam}"_selected_ref_3dcoffee.tcs
 grep -P "/.*:" "!{fam}"_selected_ref_3dcoffee.score_ascii | awk -v var=!{fam} '{print $3}' > "!{fam}"_selected_ref_3dcoffee.tcs.avg
@@ -23,14 +19,14 @@ t_coffee -infile "!{fam}"_selected_ref_mtmalign.fa_aln -evaluate -lib "!{fam}"_s
 grep SCORE "!{fam}"_selected_ref_mtmalign.score_ascii | tr "=" "\t" | cut -f2 > "!{fam}"_selected_ref_mtmalign.tcs
 grep -P "/.*:" "!{fam}"_selected_ref_mtmalign.score_ascii | awk -v var=!{fam} '{print $3}' > "!{fam}"_selected_ref_mtmalign.tcs.avg
        	
-paste "!{fam}"_selected_ref_ginsi.tcs "!{fam}"_selected_ref_tcoffee.tcs "!{fam}"_selected_ref_psicoffee.tcs "!{fam}"_selected_ref_3dcoffee.tcs "!{fam}"_selected_ref_3dcoffee_TMalign.tcs "!{fam}"_selected_ref_mtmalign.tcs > "!{fam}"_selected.tcs #"!{fam}"_selected_ref_deepblast.tcs
-paste "!{fam}"_selected_ref_ginsi.tcs.avg "!{fam}"_selected_ref_tcoffee.tcs.avg "!{fam}"_selected_ref_psicoffee.tcs.avg "!{fam}"_selected_ref_3dcoffee.tcs.avg "!{fam}"_selected_ref_3dcoffee_TMalign.tcs.avg "!{fam}"_selected_ref_mtmalign.tcs.avg > "!{fam}"_selected.tcs.avg #"!{fam}"_selected_ref_deepblast.tcs.avg
+paste "!{fam}"_selected_ref_ginsi.tcs "!{fam}"_selected_ref_tcoffee.tcs "!{fam}"_selected_ref_psicoffee.tcs "!{fam}"_selected_ref_3dcoffee.tcs "!{fam}"_selected_ref_3dcoffee_TMalign.tcs "!{fam}"_selected_ref_mtmalign.tcs > "!{fam}"_selected.tcs
+paste "!{fam}"_selected_ref_ginsi.tcs.avg "!{fam}"_selected_ref_tcoffee.tcs.avg "!{fam}"_selected_ref_psicoffee.tcs.avg "!{fam}"_selected_ref_3dcoffee.tcs.avg "!{fam}"_selected_ref_3dcoffee_TMalign.tcs.avg "!{fam}"_selected_ref_mtmalign.tcs.avg > "!{fam}"_selected.tcs.avg
 
 touch "!{fam}"_selected.nirmsd.avg
 touch "!{fam}"_selected.nirmsd.pair
 touch "!{fam}"_selected.pid.avg
 touch "!{fam}"_selected.pid.pair
-for pref in "!{fam}"_selected_ref_famsa "!{fam}"_selected_ref_ginsi "!{fam}"_selected_ref_msaprobs "!{fam}"_selected_ref_tcoffee "!{fam}"_selected_ref_psicoffee "!{fam}"_selected_ref_3dcoffee "!{fam}"_selected_ref_3dcoffee_TMalign "!{fam}"_selected_ref_mtmalign; do #"!{fam}"_selected_ref_deepblast
+for pref in "!{fam}"_selected_ref_famsa "!{fam}"_selected_ref_ginsi "!{fam}"_selected_ref_msaprobs "!{fam}"_selected_ref_tcoffee "!{fam}"_selected_ref_psicoffee "!{fam}"_selected_ref_3dcoffee "!{fam}"_selected_ref_3dcoffee_TMalign "!{fam}"_selected_ref_mtmalign; do
 	t_coffee -other_pg irmsd "$pref".fa_aln -template_file "!{fam}"_selected_ref.template_list > "$pref".all_irmsd
 	grep -P "TOTAL\s+iRMSD" "$pref".all_irmsd | awk '{print $3}' > "$pref".irmsd
 	grep -P "TOTAL\s+NiRMSD" "$pref".all_irmsd | awk '{print $3}' > "$pref".nirmsd
@@ -66,7 +62,7 @@ paste -s test.eval > "!{fam}"_selected.eval
 paste -s test.pid > "!{fam}"_selected.pid
 rm test.irmsd test.nirmsd test.eval test.pid
 
-for x in dmpfold alphafold; do
+for x in alphafold; do
 	for i in `find *."$x".pdb`; do extract_from_pdb -force -infile $i > test.pdb; mv test.pdb $i; done
 	t_coffee -infile "!{fam}"_selected_ref_3dcoffee_"$x".fa_aln -evaluate -lib "!{fam}"_selected_ref_"$x".sap.lib "!{fam}"_selected_ref_"$x".TMalign.lib -output score_ascii
 	grep SCORE "!{fam}"_selected_ref_3dcoffee_"$x".score_ascii | tr "=" "\t" | cut -f2 > "!{fam}"_selected_ref_3dcoffee_"$x".tcs

@@ -74,7 +74,7 @@ process run_comparison {
 	cpus 4
 
     input:
-	tuple val(fam), path(famsa_aln), path(ginsi_aln), path(msaprobs_aln), path(tcoffee_aln), path(tcoffee_lib), path(ginsi_lib), path(psicoffee_aln), path(psicoffee_lib), path(dssp_fasta), path(struct_fasta_files), path(struct_libs), path(struct_templates), path(temps), path(pdbs), path(af2_models) //file(deepblast_aln), file(deepblast_lib),
+	tuple val(fam), path(famsa_aln), path(ginsi_aln), path(msaprobs_aln), path(tcoffee_aln), path(tcoffee_lib), path(ginsi_lib), path(psicoffee_aln), path(psicoffee_lib), path(dssp_fasta), path(struct_fasta_files), path(struct_libs), path(struct_templates), path(temps), path(pdbs), path(af2_models)
 
 	output:
 	tuple path("*.sp*"), path("*.tc*"), path("*.avg*"), path("*.pair*"), emit: comp_output
@@ -89,7 +89,7 @@ process run_evaluation {
 	cpus 4
 
 	input:
-	tuple val(fam), path(famsa_aln), path(ginsi_aln), path(msaprobs_aln), path(tcoffee_aln), path(tcoffee_lib), path(ginsi_lib), path(psicoffee_aln), path(psicoffee_lib), path(dssp_fasta), path(struct_fasta_files), path(struct_libs), path(struct_templates), path(temps), path(pdbs), path(af2_models) //file(deepblast_aln), file(deepblast_lib),
+	tuple val(fam), path(famsa_aln), path(ginsi_aln), path(msaprobs_aln), path(tcoffee_aln), path(tcoffee_lib), path(ginsi_lib), path(psicoffee_aln), path(psicoffee_lib), path(dssp_fasta), path(struct_fasta_files), path(struct_libs), path(struct_templates), path(temps), path(pdbs), path(af2_models)
 
 	output:
 	path("*"), emit: eval_output
@@ -97,22 +97,6 @@ process run_evaluation {
 
 	shell:
 	template 'evaluations.sh'
-}
-
-process TCS_filtering {
-	tag "${fam}"
-	publishDir "${fam}/results", mode: 'copy'
-	cpus 4
-
-	input:
-	val db
-	tuple val(fam), path(fasta), path(template), path(avg_tcs), path(dssp_fasta), path(nat_pdbs), path(af2_models)
-
-	output:
-	path("*"), emit: tcs_filter_out
-
-	shell:
-	template 'filter_TCS.sh'
 }
 
 process dssp_to_fasta {
