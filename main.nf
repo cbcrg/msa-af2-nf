@@ -14,7 +14,7 @@ params.AF2 = "PF*/AF2/*.pdb"
 params.pdb_for_dssp = "PF*/*[0-9].pdb"
 
 log.info """\
-	Predictions MSA Analysis - version 0.1
+	MSA AF2 Analysis - version 0.1
 	=====================================
 	Input sequences (FASTA)			: ${params.input_fasta}
 	Input lists of sequences		: ${params.list}
@@ -22,6 +22,8 @@ log.info """\
 	Input PDB structures			: ${params.pdbs}
 	Input path to Database for PSI-Coffee	: ${params.db}
 	Predict structures with AF2		: ${params.predict}
+	Path to AF2 predicted models (if --predict false) : ${params.AF2}
+	Input PDB structures for secondary structure assignment : ${params.pdb_for_dssp}
 	"""
 	.stripIndent()
 
