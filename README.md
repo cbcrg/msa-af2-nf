@@ -22,7 +22,7 @@ The pipeline for predicting the AF2 models and producing the MSAs is built using
 ## Usage
 - Download the genetic databases required for [AlphaFold2](https://github.com/deepmind/alphafold) using the provided [script](https://github.com/deepmind/alphafold/blob/main/scripts/download_all_data.sh).
 - Download and format the database used for PSI-Coffee blast search (by default [Uniref50](https://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref50/uniref50.fasta.gz)).
-- Make sure you have both docker and singularity installed in your system.
+- Make sure you have singularity installed in your system.
 - Install the Nextflow runtime by running the following command:
 
 	$ curl -fsSL get.nextflow.io | bash

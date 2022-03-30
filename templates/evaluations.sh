@@ -54,13 +54,16 @@ for pref in "!{fam}"_selected_ref_famsa "!{fam}"_selected_ref_ginsi "!{fam}"_sel
 	paste "!{fam}"_selected.pid.pair "$pref".pid.pair > new_selected.pid.pair
     mv new_selected.pid.pair "!{fam}"_selected.pid.pair
 
+	echo -e !{fam}"\t"`esl-alistat "$pref".fa_aln | grep "Alignment length" | awk '{print $3}'` >> test.len
+
 done
 	
 paste -s test.irmsd > "!{fam}"_selected.irmsd
 paste -s test.nirmsd > "!{fam}"_selected.nirmsd
 paste -s test.eval > "!{fam}"_selected.eval
 paste -s test.pid > "!{fam}"_selected.pid
-rm test.irmsd test.nirmsd test.eval test.pid
+paste -s test.len > "!{fam}"_selected.len
+rm test.irmsd test.nirmsd test.eval test.pid test.len
 
 for x in alphafold; do
 	for i in `find *."$x".pdb`; do extract_from_pdb -force -infile $i > test.pdb; mv test.pdb $i; done
@@ -93,6 +96,9 @@ for x in alphafold; do
 		paste "!{fam}"_selected.pid.pair "$pref".pid.pair > new_selected.pid.pair
         mv new_selected.pid.pair "!{fam}"_selected.pid.pair
 
+		echo -e !{fam}"\t"`esl-alistat "$pref".fa_aln | grep "Alignment length" | awk '{print $3}'` > "$pref".len
+		paste "!{fam}"_selected.len "$pref".len > new_selected.len
+		mv new_selected.len "!{fam}"_selected.len
 	done
 
 

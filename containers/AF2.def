@@ -55,7 +55,7 @@ From: nvidia/cuda:11.0-cudnn8-runtime-ubuntu18.04
 # Install pip packages.
 	/conda/bin/pip3 install --upgrade pip \
     && /conda/bin/pip3 install -r /app/alphafold/requirements.txt \
-    && /conda/bin/pip3 install --upgrade jax jaxlib==0.1.69+cuda110 -f \
+    && /conda/bin/pip3 install --upgrade jax jaxlib==0.1.74 -f \
       https://storage.googleapis.com/jax-releases/jax_releases.html
 	ln -s /conda/lib/libcusolver.so.10 /conda/lib/libcusolver.so.11
 	#ln -s /conda/lib/libcudart.so.10.2 /conda/lib/libcudart.so.11.0
