@@ -24,13 +24,13 @@ The pipeline for predicting the AF2 models and producing the MSAs is built using
 - Download and format the database used for PSI-Coffee blast search (by default [Uniref50](https://ftp.uniprot.org/pub/databases/uniprot/uniref/uniref50/uniref50.fasta.gz)).
 - Make sure you have singularity installed in your system.
 - Install the Nextflow runtime by running the following command:
-
-	$ curl -fsSL get.nextflow.io | bash
-
+	```
+	curl -fsSL get.nextflow.io | bash
+	```
 - You can launch the pipeline execution by entering the command shown below:
-	
-	$ nextflow run athbaltzis/msa-af2-nf
-
+	```
+	nextflow run athbaltzis/msa-af2-nf
+	```
 By default the pipeline is executed against the provided example [dataset](https://github.com/athbaltzis/msa-af2-nf/tree/main/data). You can modify the input data as well as the other available parameteres listed below:
 
 #### `--input_fasta` 
