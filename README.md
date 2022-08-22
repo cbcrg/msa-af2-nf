@@ -1,5 +1,5 @@
-# msa-af2-nf
-Data, documentation, analysis and nextflow pipeline for the computation of structure-based MSAs with AlphaFold2 models
+# Improving sequence alignments with AlphaFold2 regardless of structural modeling accuracy
+Data, documentation, analysis and nextflow pipeline for the manuscript "Improving sequence alignments with AlphaFold2 regardless of structural modeling accuracy".
 
 ## Credits
 This work has been carried out in [Notredame Lab](https://github.com/cbcrg) at the [Centre for Genomic Regulation - CRG](https://www.crg.eu/)
