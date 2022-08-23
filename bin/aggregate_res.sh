@@ -3,31 +3,16 @@ for fam in `cat list_of_fams`; do
 	for mode in sp; do
 		for ref_aln in mtmalign 3dcoffee 3dcoffee_TMalign; do
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode" >> selected_comparisons_ref_"$ref_aln"_"$mode".txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".perc >> selected_comparisons_ref_"$ref_aln"_"$mode".perc.txt
-
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".avg >> selected_comparisons_ref_"$ref_aln"_avg_"$mode".txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".avg.perc >> selected_comparisons_ref_"$ref_aln"_avg_"$mode".perc.txt
-
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".pair >> selected_comparisons_ref_"$ref_aln"_pair_"$mode".txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".pair.perc >> selected_comparisons_ref_"$ref_aln"_pair_"$mode".perc.txt
 
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".same_state >> selected_comparisons_ref_"$ref_aln"_"$mode".same_state.txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".same_state.perc >> selected_comparisons_ref_"$ref_aln"_"$mode".same_state.perc.txt
-
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".avg.same_state >> selected_comparisons_ref_"$ref_aln"_avg_"$mode".same_state.txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".avg.same_state.perc >> selected_comparisons_ref_"$ref_aln"_avg_"$mode".same_state.perc.txt
-
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".pair.same_state >> selected_comparisons_ref_"$ref_aln"_pair_"$mode".same_state.txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".pair.same_state.perc >> selected_comparisons_ref_"$ref_aln"_pair_"$mode".same_state.perc.txt
 
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".without_loops >> selected_comparisons_ref_"$ref_aln"_"$mode".without_loops.txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".without_loops.perc >> selected_comparisons_ref_"$ref_aln"_"$mode".without_loops.perc.txt
-
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".avg.without_loops >> selected_comparisons_ref_"$ref_aln"_avg_"$mode".without_loops.txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".avg.without_loops.perc >> selected_comparisons_ref_"$ref_aln"_avg_"$mode".without_loops.perc.txt
-
 			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".pair.without_loops >> selected_comparisons_ref_"$ref_aln"_pair_"$mode".without_loops.txt
-			cat "$fam"/results/"$fam"_selected_ref_"$ref_aln"."$mode".pair.without_loops.perc >> selected_comparisons_ref_"$ref_aln"_pair_"$mode".without_loops.perc.txt
 		done
 	done
 
