@@ -1,5 +1,5 @@
-# Improving sequence alignments with AlphaFold2 regardless of structural modeling accuracy
-Data, documentation, analysis and nextflow pipeline for the manuscript "Improving sequence alignments with AlphaFold2 regardless of structural modeling accuracy".
+# Highly significant improvement of protein sequence alignments with AlphaFold2
+Data, documentation, analysis and nextflow pipeline for the manuscript "Highly significant improvement of protein sequence alignments with AlphaFold2".
 
 ## Credits
 This work has been carried out in [Notredame Lab](https://github.com/cbcrg) at the [Centre for Genomic Regulation - CRG](https://www.crg.eu/)
