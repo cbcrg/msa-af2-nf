@@ -18,7 +18,7 @@ grep -P "/.*:" "!{fam}"_selected_ref_3dcoffee_TMalign.score_ascii | awk -v var=!
 t_coffee -infile "!{fam}"_selected_ref_mtmalign.fa_aln -evaluate -lib "!{fam}"_selected_ref.TMalign.lib -output score_ascii
 grep SCORE "!{fam}"_selected_ref_mtmalign.score_ascii | tr "=" "\t" | cut -f2 > "!{fam}"_selected_ref_mtmalign.tcs
 grep -P "/.*:" "!{fam}"_selected_ref_mtmalign.score_ascii | awk -v var=!{fam} '{print $3}' > "!{fam}"_selected_ref_mtmalign.tcs.avg
-       	
+
 paste "!{fam}"_selected_ref_ginsi.tcs "!{fam}"_selected_ref_tcoffee.tcs "!{fam}"_selected_ref_psicoffee.tcs "!{fam}"_selected_ref_3dcoffee.tcs "!{fam}"_selected_ref_3dcoffee_TMalign.tcs "!{fam}"_selected_ref_mtmalign.tcs > "!{fam}"_selected.tcs
 paste "!{fam}"_selected_ref_ginsi.tcs.avg "!{fam}"_selected_ref_tcoffee.tcs.avg "!{fam}"_selected_ref_psicoffee.tcs.avg "!{fam}"_selected_ref_3dcoffee.tcs.avg "!{fam}"_selected_ref_3dcoffee_TMalign.tcs.avg "!{fam}"_selected_ref_mtmalign.tcs.avg > "!{fam}"_selected.tcs.avg
 
